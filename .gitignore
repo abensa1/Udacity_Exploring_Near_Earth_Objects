@@ -1,3 +1,2 @@
-# venv to be ignored
-/Users/aljazbensa/Documents/Udaciy/Python/Udacity_Exploring_Near_Earth_Objects/Udacity_Venv
-
+#Ignore virtual environment
+/Udacity_Exploring_Near_Earth_Objects/Udacity_Venv/
