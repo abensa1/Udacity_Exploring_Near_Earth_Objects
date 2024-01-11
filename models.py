@@ -44,10 +44,18 @@ class NearEarthObject:
         # You should coerce these values to their appropriate data type and
         # handle any edge cases, such as a empty name being represented by `None`
         # and a missing diameter being represented by `float('nan')`.
-        self.designation = ''
-        self.name = None
-        self.diameter = float('nan')
-        self.hazardous = False
+        diameter = info.get("diameter",'nan')
+        if diameter == "":
+            diameter = 'nan'
+
+        name = info.get("name",None)
+        if name == "":
+            name = None
+
+        self.designation = info.get("pdes", "")
+        self.name = name
+        self.diameter = float(diameter)
+        self.hazardous = (info.get('pha', False) == 'Y') or (info.get('pha', False) == 'y')
 
         # Create an empty initial collection of linked approaches.
         self.approaches = []
@@ -56,14 +64,16 @@ class NearEarthObject:
     def fullname(self):
         """Return a representation of the full name of this NEO."""
         # TODO: Use self.designation and self.name to build a fullname for this object.
-        return ''
+        if self.name:
+            return f"{self.designation} {self.name}"
+        return f"{self.name}"
 
     def __str__(self):
         """Return `str(self)`."""
         # TODO: Use this object's attributes to return a human-readable string representation.
         # The project instructions include one possibility. Peek at the __repr__
         # method for examples of advanced string formatting.
-        return f"A NearEarthObject ..."
+        return f"NEO {self.fullname} has a diameter of {self.diameter} km and {'is' if self.hazardous else 'is not'} potentially hazardous."
 
     def __repr__(self):
         """Return `repr(self)`, a computer-readable string representation of this object."""
@@ -95,13 +105,16 @@ class CloseApproach:
         # onto attributes named `_designation`, `time`, `distance`, and `velocity`.
         # You should coerce these values to their appropriate data type and handle any edge cases.
         # The `cd_to_datetime` function will be useful.
-        self._designation = ''
-        self.time = None  # TODO: Use the cd_to_datetime function for this attribute.
-        self.distance = 0.0
-        self.velocity = 0.0
+        self._designation = info.get("des",'unknown')
+        if info.get("cd"):
+            self.time = cd_to_datetime(info.get("cd"))
+        else:
+            self.time = None
+        self.distance = float(info.get("dist",0.0))
+        self.velocity = float(info.get("v_rel",0.0))
 
         # Create an attribute for the referenced NEO, originally None.
-        self.neo = None
+        self.neo = info.get("neo",None)
 
     @property
     def time_str(self):
@@ -118,17 +131,42 @@ class CloseApproach:
         """
         # TODO: Use this object's `.time` attribute and the `datetime_to_str` function to
         # build a formatted representation of the approach time.
+        if self.time:
+            time = datetime_to_str(self.time)
+        else:
+            time = "N/A"
+
         # TODO: Use self.designation and self.name to build a fullname for this object.
-        return ''
+        return time
 
     def __str__(self):
         """Return `str(self)`."""
         # TODO: Use this object's attributes to return a human-readable string representation.
         # The project instructions include one possibility. Peek at the __repr__
         # method for examples of advanced string formatting.
-        return f"A CloseApproach ..."
+        return f"At {self.time_str}, '{self._designation}' approaches Earth at a distance of {self.distance:.2f} au and a velocity of {self.velocity:.2f} km/s."
 
     def __repr__(self):
         """Return `repr(self)`, a computer-readable string representation of this object."""
         return f"CloseApproach(time={self.time_str!r}, distance={self.distance:.2f}, " \
                f"velocity={self.velocity:.2f}, neo={self.neo!r})"
+    
+    def serialize(self):
+        return {'datetime_utc': self.time_str, 
+                'distance_au': self.distance,
+                'velocity_km_s': self.velocity,
+                'neo': {
+                    'designation': self.neo.designation,
+                    'name': self.neo.name,
+                    'diameter_km': self.neo.diameter,
+                    'potentially_hazardous': self.neo.hazardous
+                }
+        }
+    
+    """$ python3 -q
+    >>> from models import NearEarthObject, CloseApproach
+    >>> neo = NearEarthObject(designation=433,diameter=12.0,hazardous='Y')  # Use any sample data here.
+    >>> ca = CloseApproach()
+    >>> print(neo.designation)
+    2020 FK
+    """
