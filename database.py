@@ -46,8 +46,6 @@ class NEODatabase:
         self.neos_by_designation= dict()
         self.neos_by_name = dict()
 
-        # TODO: Link together the NEOs and their close approaches.
-
         for neo in self._neos:
             self.neos_by_designation[neo.designation] = neo
             if neo.name:
@@ -122,14 +120,6 @@ class NEODatabase:
         :param filters: A collection of filters capturing user-specified criteria.
         :return: A stream of matching `CloseApproach` objects.
         """
-        # TODO: Generate `CloseApproach` objects that match all of the filters.
-        # if filters:
-        #     for approach in self._approaches:
-        #         if all(map(lambda fil: fil(approach), filters)):
-        #             yield approach
-        # else:
-        #     for approach in self._approaches:
-        #         yield approach
 
         for approach in self._approaches:
             result = [filter(approach) for filter in filters]

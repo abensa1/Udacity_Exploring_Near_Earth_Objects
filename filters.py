@@ -73,28 +73,55 @@ class AttributeFilter:
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
     
 class DateFilter(AttributeFilter):
+    """AttributeFilter Subclass to filter CloseApproach objects by date."""
+
     @classmethod
     def get(cls, approach):
+        """Return approach.time.date() for the date filter.
+        :param approach: A CloseApproach object.
+        :return: Converted time to datetime object.
+        """
         return approach.time.date()
     
 class DistanceFilter(AttributeFilter):
+    """AttributeFilter Subclass to filter objects by distance.""" 
+
     @classmethod
     def get(cls, approach):
+        """Returns filtered distance of the CloseApproach object.
+        :param approach: A CloseApproach object.
+        :return: Distance of a CloseApproach.
+        """
         return approach.distance
     
 class VelocityFilter(AttributeFilter):
+    """Subclass of AttributeFilter to filter objects by velocity."""
     @classmethod
     def get(cls, approach):
+        """Returns filtered velocity for the object
+        :param approach: A CloseApproach object.
+        :return: Velocity of a CloseApproach.
+        """
         return approach.velocity
     
 class DiameterFilter(AttributeFilter):
+    """Subclass of AttributeFilter to filter objects by diameter."""
     @classmethod
     def get(cls, approach):
+        """Returns the filtered diameter of the neo object 
+        :param approach: A CloseApproach object.
+        :return: diameter of a NEO.
+        """
         return approach.neo.diameter
     
 class HazardousFilter(AttributeFilter):
+    """Subclass of AttributeFilter to filter objects by their hazardousness."""
     @classmethod
     def get(cls, approach):
+        """Returns filtere hazardous attribute for the neo object
+        :param approach: A CloseApproach object.
+        :return: hazardous attribute of a NEO.
+        """
         return approach.neo.hazardous
 
 
@@ -134,7 +161,6 @@ def create_filters(
     :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
     :return: A collection of filters for use with `query`.
     """
-    # TODO: Decide how you will represent your filters.
     filters=[]
 
     if date:
@@ -179,7 +205,6 @@ def limit(iterator, n=None):
     :param n: The maximum number of values to produce.
     :yield: The first (at most) `n` values from the iterator.
     """
-    # TODO: Produce at most `n` values from the given iterator.
     if (n==None) or (n==0):
         return islice(iterator, None)
     return islice(iterator, n)
